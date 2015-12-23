@@ -1,0 +1,23 @@
+function avg_logprob = hybrid_emb_training(last_dir, new_dir, vars)
+% Hybrid Embedded training with HERest
+
+hmm_defs_path = fullfile(last_dir, vars.hmm_defs);
+floor_path = fullfile(last_dir, vars.hmm_vfloors);
+
+if ~exist(new_dir, 'dir')
+    mkdir(new_dir);
+end
+
+% log_path = fullfile(new_dir, 'emb.log');
+
+cmd = strjoin({'emb_dnn_train.exe' vars.global_opt ...
+               '-C' vars.htk_cfg_file...
+               '-H' hmm_defs_path ...
+               '-H' floor_path ...
+               '-S' vars.tr.samp_list ...
+               '-I' vars.tr.phone_mlf...
+               '-M' new_dir ...
+               vars.phone_list});
+
+cmdout = htk_run(cmd, mfilename('fullpath'));
+avg_logprob = get_emb_res(cmdout);
